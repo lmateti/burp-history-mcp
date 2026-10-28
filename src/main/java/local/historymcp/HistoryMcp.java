@@ -23,7 +23,8 @@ public final class HistoryMcp implements BurpExtension {
     private String token;
     private int port;
 
-    @Override public void initialize(MontoyaApi api){
+    @Override 
+    public void initialize(MontoyaApi api){
         this.api=api;api.extension().setName("History MCP — resumable search and read");
         try{
             port=HistoryService.prop("historymcp.port",9877);
@@ -40,7 +41,7 @@ public final class HistoryMcp implements BurpExtension {
                 throw new IllegalArgumentException("Empty token");
 
             server=new NanoHTTPD("127.0.0.1",port){
-                @Override public Response serve(IHTTPSession s){
+                @ public Response serve(IHTTPSession s){
                     if(closed||!slots.tryAcquire())
                         return reply(503,null);
 
