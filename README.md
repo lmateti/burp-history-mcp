@@ -133,6 +133,6 @@ Resource-limit/error/cancellation discards affected search session, never silent
 src/main/resources/tool.json is the exact tools/list definition. Includes oneOf branches for new search, read, and cursor-only; descriptions of context units, continuation including empty pages, and counts; and output schema for both operations. Successful responses supply both structuredContent and serialized JSON text content (MCP compatibility), so a client that exposes both may incur duplicate token cost. Error results use isError=true and text error content, no success payload.
 
 ## References
-https://modelcontextprotocol.io/specification/2025-06-18/server/tools
-https://modelcontextprotocol.io/specification/2025-11-25/basic/utilities/cancellation
-https://portswigger.github.io/burp-extensions-montoya-api/javadoc/burp/api/montoya/proxy/Proxy.html
+- https://modelcontextprotocol.io/specification/2025-06-18/server/tools
+- https://modelcontextprotocol.io/specification/2025-11-25/basic/utilities/cancellation
+- https://portswigger.github.io/burp-extensions-montoya-api/javadoc/burp/api/montoya/proxy/Proxy.html
