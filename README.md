@@ -2,6 +2,12 @@
 
 Complete Java/Maven Burp extension, MCP server exposing one readonly MCP tool, `search_proxy_history`, supporting `search` and `read` operations with bundled NanoHTTPD server. 
 
+## Idea & Motivation
+I needed a way for my agents to analyze specific chunks of data located in proxy history, in context around found search patterns, as part of my ongoing black-box front-end analysis efforts.
+The core challenge was how to compress proxy history to something workable for local agents and avoid context rot while preserving important information. Then I remembered that I used grep -C a lot for my agents when analyzing large files locally via bash. I vibe-coded a grep-like search solution that uses existing Burp scope and search capability and deduplicates results.
+
+The performance was tested with a local model using opencode harness on a >5GB Burp project. The solution intentionally exposes read-only tools to minimize risk and additional security configuration needed when using it. Use existing and official Burp MCP Server for when agents need to perform actions. 
+
 ## Build / install
 JDK 21+ for Maven, Java release target 21; compatible Burp with Montoya 2026.7. First build needs Maven dependencies.
 
