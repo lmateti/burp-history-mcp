@@ -9,4 +9,4 @@
 - Added discoverable input/output schemas and detailed model-facing instructions.
 - Added structuredContent with compatibility text representation.
 - Replaced smoke script with inspector supporting continuation, range read, and full validation.
-- Continued bundled NanoHTTPD; no jdk.httpserver dependency.
+- Bundled NanoHTTPD server.
