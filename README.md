@@ -1,4 +1,4 @@
-# Burp History MCP 0.2.0
+# Proxy History MCP
 
 Complete Java/Maven Burp extension, MCP server exposing one readonly MCP tool, `search_proxy_history`, supporting `search` and `read` operations with bundled NanoHTTPD server. 
 
