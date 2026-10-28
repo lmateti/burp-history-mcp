@@ -1,0 +1,16 @@
+target/
+.idea/
+*.iml
+*.jsonl
+
+# Local secrets and configuration
+.env
+.env.*
+!.env.example
+
+# Captured traffic / test artifacts
+*.burp
+*.log
+
+# Backups from earlier patches
+*.pre-nanohttpd.bak
