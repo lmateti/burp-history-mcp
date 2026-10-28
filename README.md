@@ -1,9 +1,6 @@
 # Burp History MCP 0.2.0
 
-Complete Java/Maven extension. Exactly one MCP tool, `search_proxy_history`, supporting `search` and `read` operations. Bundled, relocated NanoHTTPD; no dependency on jdk.httpserver.
-
-## Status and validation
-Java, Maven, and Burp are unavailable in the authoring environment. Java compilation, JUnit execution, and end-to-end interoperability have NOT been performed. Project XML, tool JSON/schema (11 input validation cases), Python syntax, source delimiter balance, and ZIP integrity were checked. Build/test locally before using in an agent harness.
+Complete Java/Maven extension exposing one readonly MCP tool, `search_proxy_history`, supporting `search` and `read` operations with bundled NanoHTTPD server. 
 
 ## Build / install
 JDK 21+ for Maven, Java release target 21; compatible Burp with Montoya 2026.7. First build needs Maven dependencies.
@@ -12,20 +9,15 @@ JDK 21+ for Maven, Java release target 21; compatible Burp with Montoya 2026.7. 
 mvn clean verify
 ```
 
-Open pom.xml as Maven project in IntelliJ, reload dependencies, then clean/verify. Unload old extension; load `target/history-mcp.jar`, NOT `original-history-mcp.jar`. Output prints endpoint and bearer token. Treat token as secret.
+Open pom.xml as a Maven project in IntelliJ, reload dependencies, then clean/verify with the provided command. Load `target/history-mcp.jar`, NOT `original-history-mcp.jar`. Output prints endpoint and bearer token. Treat token as a secret.
 
-## Client connection
+## Default client connection information
 - Streamable HTTP: `http://127.0.0.1:9877/mcp`
 - Authorization: `Bearer TOKEN`
-- Recommended request timeout: 30 seconds or more; default cooperative work slice 5 seconds.
-- Protocol revisions implemented: 2025-06-18 and 2025-11-25. This is not the 2026 protocol revision.
+- Recommended request timeout: 30 seconds or more.
+- MCP Protocol revisions implemented: 2025-06-18 and 2025-11-25. This is not the 2026 protocol revision.
 
-Example (client config syntax varies):
-```json
-{"mcpServers":{"burp-history":{"type":"http","url":"http://127.0.0.1:9877/mcp","headers":{"Authorization":"Bearer TOKEN"}}}}
-```
-
-MCP is manually implemented, not SDK-backed. JSON responses, no legacy SSE or stdio bridge, no server-initiated progress messages, no OAuth discovery, GET/DELETE=405. No MCP transport sessions. POST requires Content-Length; chunked transfer requests rejected. Responses close connections. Compatible client JSON calls must include Content-Length. Bearer token is shared across clients; search/cursor namespace is extension-wide, not per-user.
+MCP is manually implemented. JSON responses, no legacy SSE or stdio bridge supported and no server-initiated progress messages. POST requires Content-Length; chunked transfer requests rejected. Search/cursor namespace is extension-wide, not per-user.
 
 ## Search
 ```json
