@@ -25,7 +25,7 @@ public final class HistoryMcp implements BurpExtension {
 
     @Override 
     public void initialize(MontoyaApi api){
-        this.api=api;api.extension().setName("History MCP — resumable search and read");
+        this.api=api;api.extension().setName("Proxy History MCP");
         try{
             port=HistoryService.prop("historymcp.port",9877);
             service=new HistoryService(api);
@@ -73,7 +73,7 @@ public final class HistoryMcp implements BurpExtension {
 
             api.extension().registerUnloadingHandler(this::close);
             server.start(10000,true);
-            api.logging().logToOutput("History MCP 0.2.0 (NanoHTTPD)\nEndpoint: http://127.0.0.1:"+port+"/mcp\nBearer token (sensitive): "+token+
+            api.logging().logToOutput("Proxy History MCP 0.2.0\nEndpoint: http://127.0.0.1:"+port+"/mcp\nBearer token (sensitive): "+token+
                 "\nOne tool: search_proxy_history; operations search/read; incremental cursors. Default work budget 5000ms (cooperative).");
         }catch(Exception | LinkageError e){
             close();
