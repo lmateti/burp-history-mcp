@@ -1,6 +1,6 @@
 # Burp History MCP 0.2.0
 
-Complete Java/Maven extension exposing one readonly MCP tool, `search_proxy_history`, supporting `search` and `read` operations with bundled NanoHTTPD server. 
+Complete Java/Maven Burp extension, MCP server exposing one readonly MCP tool, `search_proxy_history`, supporting `search` and `read` operations with bundled NanoHTTPD server. 
 
 ## Build / install
 JDK 21+ for Maven, Java release target 21; compatible Burp with Montoya 2026.7. First build needs Maven dependencies.
