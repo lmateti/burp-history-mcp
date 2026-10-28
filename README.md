@@ -9,7 +9,7 @@ JDK 21+ for Maven, Java release target 21; compatible Burp with Montoya 2026.7. 
 mvn clean verify
 ```
 
-Open pom.xml as a Maven project in IntelliJ, reload dependencies, then clean/verify with the provided command. Load `target/history-mcp.jar`, NOT `original-history-mcp.jar`. Output prints endpoint and bearer token. Treat token as a secret.
+Open pom.xml as a Maven project in IntelliJ, reload dependencies, then clean/verify with the provided command. Load `target/history-mcp.jar`. Output prints endpoint and bearer token. Treat token as a secret.
 
 ## Default client connection information
 - Streamable HTTP: `http://127.0.0.1:9877/mcp`
