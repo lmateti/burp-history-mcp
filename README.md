@@ -17,17 +17,17 @@ Open pom.xml as a Maven project in IntelliJ, reload dependencies, then clean/ver
 - Recommended request timeout: 30 seconds or more.
 - MCP Protocol revisions implemented: 2025-06-18 and 2025-11-25. This is not the 2026 protocol revision.
 
-MCP is manually implemented. JSON responses, no legacy SSE or stdio bridge supported and no server-initiated progress messages. POST requires Content-Length; chunked transfer requests rejected. Search/cursor namespace is extension-wide, not per-user.
+MCP is manually implemented. JSON responses, no legacy SSE or stdio bridge supported and no server-initiated progress messages. POST requires Content-Length. Search/cursor namespace is extension-wide, not per-user.
 
-## Search
+## Search Example
 ```json
 {
   "operation":"search",
-  "pattern":"(?i)api[_-]?key",
+  "pattern":"api[_-]?key",
   "target":"response_body",
   "context_before":200,
-  "context_after":400,
-  "max_matches":20,
+  "context_after":200,
+  "max_matches":50,
   "work_budget_ms":5000,
   "url_regex":"https://app\\.example\\.com/.*",
   "in_scope_only":false
@@ -58,12 +58,12 @@ Each call stops at a unique-result page limit (1..500), approximately 250000 sni
 ```
 
 This abbreviated example omits metrics. Empty pages with next_cursor are VALID. Continue even after an empty page to exhaust the search:
+
 ```json
 {"cursor":"opaque-token"}
 ```
-Cursor-only means no other arguments. Original pattern, filters, context, page size, work budget and live matcher state are retained. Never restart regex on a substring: anchors, lookbehind, and \G continue against the original text. Completion can require an empty final page because page filling does not probe ahead.
 
-Next cursor null means exhausted. search_complete false means partial coverage, NOT a complete no-match answer. No guarantee time to first useful hit; budget calls may visit only duplicate or nonmatching content.
+Cursor-only means no other arguments. Original pattern, filters, context, page size, work budget and live matcher state are retained. Completion can require an empty final page because page filling does not probe ahead. Next cursor null means exhausted. search_complete false means partial coverage, NOT a complete no-match answer. No guarantee time to first useful hit; budget calls may visit only duplicate or non-matching content.
 
 ### Counts and deduplication
 One exact snippet string across any selected entries/targets/offsets is returned only once PER SESSION. No normalization or hashing. Dedup map persists across slices. Duplicate snippets within one response also collapse. Context windows are not merged unless their complete strings match.
@@ -121,39 +121,10 @@ Java system properties before extension load:
 - historymcp.token (optional preset)
 - historymcp.allowedOrigin (one exact Origin; default rejects all requests with Origin).
 
-Old historymcp.searchTimeoutMs no longer controls search: use work_budget_ms in tool call. Defaults work under installed Burp; no JVM module flags needed.
-
 Resource-limit/error/cancellation discards affected search session, never silently evicts seen snippets or claims completeness. Results already emitted remain partial. Narrow query/start new session after fixing error. Character limits are not exact JVM heap caps: metadata, strings, snapshots, matchers, page copies and JSON consume additional heap. Up to 3 sessions each retaining large active text can use substantial memory. Materialization can allocate BEFORE size check.
 
 ## Model-facing documentation
 src/main/resources/tool.json is the exact tools/list definition. Includes oneOf branches for new search, read, and cursor-only; descriptions of context units, continuation including empty pages, and counts; and output schema for both operations. Successful responses supply both structuredContent and serialized JSON text content (MCP compatibility), so a client that exposes both may incur duplicate token cost. Error results use isError=true and text error content, no success payload.
-
-## Smoke test and inspector
-Python standard library only:
-```sh
-python3 scripts/inspect_results.py --pattern '(?i)api[_-]?key' --page-size 5 --work-budget-ms 1000 --pages 3 --read-first
-```
-Token prompts without echo; --token or BURP_MCP_TOKEN also accepted. --raw-mcp prints full tool envelope; default prints decoded results. --save FILE.jsonl saves page JSON (exclusive create, mode 0600); contains sensitive traffic. --all follows cursors, including empty pages. --cursor TOKEN resumes an existing session without a new regex scan. --target must match read target.
-
-Full smoke validation (all pages; actual range-read check if any result):
-```sh
-python3 scripts/inspect_results.py --pattern '(?i)secret|token|password' --page-size 20 --work-budget-ms 1000 --smoke
-```
-Direct range read:
-```sh
-python3 scripts/inspect_results.py --read-id 1842 --target response_body --offset 42000 --length 12000
-```
-
-Unit tests:
-```sh
-mvn test
-```
-15 tests: multi-match, duplicate suppression across pages, no retroactive count mutation, deep match, 10000 duplicates, context identity, zero length, Unicode, lookbehind, anchors, \G, cancellation, memory limit, empty budget page, tool documentation. Not executed here. Tests are not a substitute for real Burp/transport/session-lifecycle testing.
-
-Manual checks: read amidst active searches; two sessions interleaved without reset; immediately preceding cursor retry; old/expired cursor error; completion after empty page; cancellation; client timeout without cancellation; unload; missing/modified response; encoded bodies; huge minified line; schema validation by your harness. All results are captured HTTP text, not a security finding by themselves.
-
-## Security
-Loopback IPv4 only; bearer constant-time comparison, Host restriction, exact Origin, 64KiB JSON request cap; no permissive CORS/preflight; no-store responses. Socket read timeout 10 seconds, separate from search work. Eight admitted handler requests; NanoHTTPD socket threads are not globally bounded. Single trusted local deployment, not hardened multi-tenant service. No intentional body/snippet logging; token logged at startup. Client/model provider may receive sensitive project data.
 
 ## References
 https://modelcontextprotocol.io/specification/2025-06-18/server/tools
