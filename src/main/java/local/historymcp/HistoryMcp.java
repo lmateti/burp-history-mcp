@@ -62,14 +62,27 @@ public final class HistoryMcp implements BurpExtension {
                 return t;
             });
 
-            cleaner.scheduleAtFixedRate(()->{
-                if(calls.tryAcquire())
-                    try{
-                        service.expire();
-                    }finally{
-                        calls.release();
+            cleaner.scheduleAtFixedRate(() -> {
+                if (!calls.tryAcquire()) {
+                    return;
+                }
+            
+                try {
+                    service.expire();
+                } catch (Exception e) {
+                    StringWriter trace = new StringWriter();
+            
+                    try (PrintWriter writer = new PrintWriter(trace)) {
+                        e.printStackTrace(writer);
                     }
-            },1,1,TimeUnit.MINUTES);
+            
+                    api.logging().logToError(
+                        "History MCP session cleanup failed:\n" + trace
+                    );
+                } finally {
+                    calls.release();
+                }
+            }, 1, 1, TimeUnit.MINUTES);
 
             api.extension().registerUnloadingHandler(this::close);
             server.start(10000,true);
